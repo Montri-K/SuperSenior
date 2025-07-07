@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>ตารางคะแนนผ่าน Tabletop.js</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://unpkg.com/tabletop@1.6.4/tabletop.js"></script>
   <style>
     body {
@@ -10,18 +11,15 @@
       text-align: center;
       margin: 20px;
     }
-
     table {
       border-collapse: collapse;
       width: 90%;
       margin: 20px auto;
     }
-
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
     }
-
     th {
       background-color: #f0f0f0;
     }
@@ -29,126 +27,82 @@
 </head>
 <body>
 
-  <h1>ผลการแข่งขัน: Super Senior League</h1>
+<h1>ผลการแข่งขัน: Super Senior League</h1>
 
-  <table id="matchResults">
-    <thead>
-      <tr>
-        <th>คู่ที่</th>
-        <th>ทีมเหย้า</th>
-        <th>ประตู</th>
-        <th>ทีมเยือน</th>
-        <th>ประตู</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<table id="matchResults">
+  <thead>
+    <tr>
+      <th>คู่ที่</th><th>ทีมเหย้า</th><th>ประตู</th><th>ทีมเยือน</th><th>ประตู</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-  <h2>ตารางคะแนน</h2>
+<h2>ตารางคะแนน</h2>
 
-  <table id="leagueTable">
-    <thead>
-      <tr>
-        <th>ทีม</th>
-        <th>แข่ง</th>
-        <th>ชนะ</th>
-        <th>เสมอ</th>
-        <th>แพ้</th>
-        <th>ได้</th>
-        <th>เสีย</th>
-        <th>แต้ม</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<table id="leagueTable">
+  <thead>
+    <tr>
+      <th>ทีม</th><th>แข่ง</th><th>ชนะ</th><th>เสมอ</th><th>แพ้</th><th>ได้</th><th>เสีย</th><th>แต้ม</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-  <script>
-    const sheetKey = "1RUxRuAEX3fuDZNI2JKdft-rYm55oIQC15_gj9WViuSI";
-    const teams = {};
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const sheetKey = "1RUxRuAEX3fuDZNI2JKdft-rYm55oIQC15_gj9WViuSI";
+  const teams = {};
 
-    Tabletop.init({
-      key: sheetKey,
-      simpleSheet: true,
-      callback: function(data) {
-        data.forEach((r) => {
-          const home = r.home;
-          const away = r.away;
-          const hg = parseInt(r.homeGoals);
-          const ag = parseInt(r.awayGoals);
+  Tabletop.init({
+    key: sheetKey,
+    simpleSheet: true,
+    callback: function(data) {
+      data.forEach((r) => {
+        const home = r.home?.trim();
+        const away = r.away?.trim();
+        const hg = parseInt(r.homeGoals);
+        const ag = parseInt(r.awayGoals);
+        if (!home || !away || isNaN(hg) || isNaN(ag)) return;
 
-          if (isNaN(hg) || isNaN(ag)) return;
+        document.querySelector("#matchResults tbody").innerHTML += `
+          <tr><td>${r.match}</td><td>${home}</td><td>${hg}</td><td>${away}</td><td>${ag}</td></tr>
+        `;
 
-          // แสดงผลการแข่งขัน
-          document.querySelector("#matchResults tbody").innerHTML += `
-            <tr>
-              <td>${r.match}</td>
-              <td>${home}</td>
-              <td>${hg}</td>
-              <td>${away}</td>
-              <td>${ag}</td>
-            </tr>
-          `;
-
-          // เตรียมข้อมูลทีม
-          [home, away].forEach(team => {
-            if (!teams[team]) {
-              teams[team] = {
-                name: team,
-                played: 0, won: 0, draw: 0, lost: 0,
-                gf: 0, ga: 0, pts: 0
-              };
-            }
-          });
-
-          // อัปเดตสถิติทีม
-          teams[home].played++;
-          teams[away].played++;
-          teams[home].gf += hg;
-          teams[home].ga += ag;
-          teams[away].gf += ag;
-          teams[away].ga += hg;
-
-          if (hg > ag) {
-            teams[home].won++;
-            teams[home].pts += 3;
-            teams[away].lost++;
-          } else if (hg < ag) {
-            teams[away].won++;
-            teams[away].pts += 3;
-            teams[home].lost++;
-          } else {
-            teams[home].draw++;
-            teams[away].draw++;
-            teams[home].pts++;
-            teams[away].pts++;
-          }
+        [home, away].forEach(t => {
+          if (!teams[t]) teams[t] = { name: t, played: 0, won: 0, draw: 0, lost: 0, gf: 0, ga: 0, pts: 0 };
         });
 
-        // เรียงลำดับตารางคะแนน
-        const sorted = Object.values(teams).sort((a, b) =>
-          b.pts - a.pts ||
-          (b.gf - b.ga) - (a.gf - a.ga) ||
-          b.gf - a.gf
-        );
+        teams[home].played++; teams[away].played++;
+        teams[home].gf += hg; teams[home].ga += ag;
+        teams[away].gf += ag; teams[away].ga += hg;
 
-        // แสดงตารางคะแนน
-        sorted.forEach(t => {
-          document.querySelector("#leagueTable tbody").innerHTML += `
-            <tr>
-              <td>${t.name}</td>
-              <td>${t.played}</td>
-              <td>${t.won}</td>
-              <td>${t.draw}</td>
-              <td>${t.lost}</td>
-              <td>${t.gf}</td>
-              <td>${t.ga}</td>
-              <td>${t.pts}</td>
-            </tr>
-          `;
-        });
-      }
-    });
-  </script>
+        if (hg > ag) {
+          teams[home].won++; teams[home].pts += 3; teams[away].lost++;
+        } else if (hg < ag) {
+          teams[away].won++; teams[away].pts += 3; teams[home].lost++;
+        } else {
+          teams[home].draw++; teams[away].draw++;
+          teams[home].pts++; teams[away].pts++;
+        }
+      });
+
+      const sorted = Object.values(teams).sort((a, b) =>
+        b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf
+      );
+
+      sorted.forEach(t => {
+        document.querySelector("#leagueTable tbody").innerHTML += `
+          <tr>
+            <td>${t.name}</td><td>${t.played}</td><td>${t.won}</td><td>${t.draw}</td>
+            <td>${t.lost}</td><td>${t.gf}</td><td>${t.ga}</td><td>${t.pts}</td>
+          </tr>
+        `;
+      });
+    }
+  });
+});
+</script>
 
 </body>
 </html>
