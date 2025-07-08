@@ -35,7 +35,7 @@
 </table>
 
 <script>
-  const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzWcRKdLuuJIxBGQqZy8aV9w3YCKtAy6_7ukxAeHOX-5YvVpDd0XapDSpt6Kvd1b3_Wbs921m1NJEv/pub?output=csv&t=" + new Date().getTime();
+  const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzWcRKdLuuJIxBGQqZy8aV9w3YCKtAy6_7ukxAeHOX-5YvVpDd0XapDSpt6Kvd1b3_Wbs921m1NJEv/pub?output=csv&nocache=" + Date.now();
 
   fetch(csvURL)
     .then(res => res.text())
