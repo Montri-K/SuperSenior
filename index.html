@@ -7,7 +7,7 @@
   <style>
     body { font-family: sans-serif; text-align: center; margin: 20px; padding: 0 10px; }
     h1, h2 { font-size: 22px; margin-top: 30px; }
-    table { border-collapse: collapse; width: 100%; margin: 20px auto; overflow-x: auto; display: block; }
+    table { border-collapse: collapse; width: 100%; max-width: 100%; margin: 20px auto; overflow-x: auto; display: block; }
     th, td { border: 1px solid #ccc; padding: 8px; font-size: 14px; }
     th { background-color: #f0f0f0; }
     @media screen and (max-width: 480px) {
@@ -21,9 +21,7 @@
 <h1>ผลการแข่งขัน: Super Senior League</h1>
 <table id="matchResults">
   <thead>
-    <tr>
-      <th>คู่ที่</th><th>ทีมเหย้า</th><th>ประตู</th><th>ทีมเยือน</th><th>ประตู</th>
-    </tr>
+    <tr><th>คู่ที่</th><th>ทีมเหย้า</th><th>ประตู</th><th>ทีมเยือน</th><th>ประตู</th></tr>
   </thead>
   <tbody></tbody>
 </table>
@@ -31,15 +29,13 @@
 <h2>ตารางคะแนน</h2>
 <table id="leagueTable">
   <thead>
-    <tr>
-      <th>ทีม</th><th>แข่ง</th><th>ชนะ</th><th>เสมอ</th><th>แพ้</th><th>ได้</th><th>เสีย</th><th>แต้ม</th>
-    </tr>
+    <tr><th>ทีม</th><th>แข่ง</th><th>ชนะ</th><th>เสมอ</th><th>แพ้</th><th>ได้</th><th>เสีย</th><th>แต้ม</th></tr>
   </thead>
   <tbody></tbody>
 </table>
 
 <script>
-  const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzWcRKdLuuJIxBGQqZy8aV9w3YCKtAy6_7ukxAeHOX-5YvVpDd0XapDSpt6Kvd1b3_Wbs921m1NJEv/export?format=csv&t=" + new Date().getTime();
+  const csvURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzWcRKdLuuJIxBGQqZy8aV9w3YCKtAy6_7ukxAeHOX-5YvVpDd0XapDSpt6Kvd1b3_Wbs921m1NJEv/pub?output=csv&t=" + new Date().getTime();
 
   fetch(csvURL)
     .then(res => res.text())
@@ -87,8 +83,10 @@
 
       sorted.forEach(t => {
         document.querySelector("#leagueTable tbody").innerHTML += `
-          <tr><td>${t.name}</td><td>${t.played}</td><td>${t.won}</td><td>${t.draw}</td>
-          <td>${t.lost}</td><td>${t.gf}</td><td>${t.ga}</td><td>${t.pts}</td></tr>
+          <tr>
+            <td>${t.name}</td><td>${t.played}</td><td>${t.won}</td><td>${t.draw}</td>
+            <td>${t.lost}</td><td>${t.gf}</td><td>${t.ga}</td><td>${t.pts}</td>
+          </tr>
         `;
       });
     });
